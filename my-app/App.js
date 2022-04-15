@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Calculo do Índice de Massa Muscular!!!</Text>
+      <Text>Seguindo os passos da documentação!</Text>
       <StatusBar style="auto" />
     </View>
   );
