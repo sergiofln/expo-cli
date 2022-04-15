@@ -1,13 +1,14 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity,  View } from 'react-native';
+import { Image, Platform,StyleSheet, Text, TouchableOpacity,  View } from 'react-native';
 import logo from './assets/logo.png';
 import * as ImagePicker from 'expo-image-picker';
+import * as Sharing from 'expo-sharing';
 
 export default function App() {
   const [selectedImage, setSelectImage] = React.useState(null);
 
   let openImagePickerAsync = async () => {
-    let permissionResult = await ImagePicker.requestMediLibraryPermissionsAsync();
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
       alert("Permission to acess camera roll is required!");
@@ -23,6 +24,14 @@ export default function App() {
     setSelectImage({localUri: pickerResult.uri });
   };
 
+  let openShareDialogAsync = async () => {
+    if (Platform.OS === 'web') {
+      alert(`Uh oh, sharing isn't available on your platform`);
+      return;
+    }
+    await Sharing.shareAsync(selectedImage.localUri);
+  };
+
   if (selectedImage !== null) {
     return (
       <View style={styles.container}>
@@ -30,6 +39,9 @@ export default function App() {
           source={{ uri: selectedImage.localUri }}
           style={styles.thumbnail}
         />
+        <TouchableOpacity onPress={openShareDialogAsync} style={styles.button}>
+          <Text style = {styles.buttonText}>Share this photo</Text>
+        </TouchableOpacity>
       </View>
     );
   }
