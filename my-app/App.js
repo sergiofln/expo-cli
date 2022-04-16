@@ -1,11 +1,17 @@
 import React from 'react';
-import { Image, Platform,StyleSheet, Text, TouchableOpacity,  View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity,  View } from 'react-native';
 import logo from './assets/logo.png';
 import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
+import uploadToAnonymousFilesAsync from 'anonymous-files';
+
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
+setTimeout(SplashScreen.hideAsync, 5000);
 
 export default function App() {
-  const [selectedImage, setSelectImage] = React.useState(null);
+  const [selectedImage, setSelectedImage] = React.useState(null);
 
   let openImagePickerAsync = async () => {
     let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -15,21 +21,26 @@ export default function App() {
       return;
     }
 
-    let pickerResult = await ImagePicker.launchImageLibraryAsync();
-    
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();    
     if (pickerResult.cancelled === true) {
       return;
     }
+    
+    if (Platform.OS === 'web') {
+      let remoteUri = await uploadToAnonymousFilesAsync(pickerResult.uri);
+      setSelectedImage({ localUri: pickerResult.uri, remoteUri });
+    } else {
+      setSelectedImage({ localUri: pickerResult.uri, remoteUri: null });
+    } 
 
-    setSelectImage({localUri: pickerResult.uri });
   };
 
   let openShareDialogAsync = async () => {
-    if (Platform.OS === 'web') {
-      alert(`Uh oh, sharing isn't available on your platform`);
+    if (!(await Sharing.isAvailableAsync())) {
+      alert(`The image is available for sharing at: ${selectedImage.remoteUri}`);
       return;
     }
-    await Sharing.shareAsync(selectedImage.localUri);
+    Sharing.shareAsync(selectedImage.remoteUri || selectedImage.localUri);
   };
 
   if (selectedImage !== null) {
