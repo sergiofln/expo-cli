@@ -5,10 +5,12 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
 import uploadToAnonymousFilesAsync from 'anonymous-files';
 
+/* - código para atrasar a ocultação da tela inicial por cinco segundos.
 import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 5000);
+*/
 
 export default function App() {
   const [selectedImage, setSelectedImage] = React.useState(null);
